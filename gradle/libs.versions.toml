@@ -1,6 +1,7 @@
 [versions]
 agp = "8.11.1"
 kotlin = "2.2.0"
+googleKsp = "2.2.0-2.0.2"
 coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -13,6 +14,9 @@ kotlinxSerializationJson = "1.9.0"
 material-icons-extended = "1.7.8"
 datastore = "1.1.7"
 kotlinxDatetime = "0.7.1"
+koin = "4.1.0"
+room = "2.7.2"
+navigation = "2.9.1"
 #noinspection NewerVersionAvailable
 ktorClient = "3.0.0"
 
@@ -35,7 +39,14 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "material-icons-extended" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
-
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
+koin-androidx-navigation = { module = "io.insert-koin:koin-androidx-navigation", version.ref = "koin" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
 kotlinx-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktorClient" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktorClient" }
@@ -49,3 +60,4 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+google-ksp = { id = "com.google.devtools.ksp", version.ref = "googleKsp" }

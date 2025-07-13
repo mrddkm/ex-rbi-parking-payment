@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.google.ksp)
 }
 
 val buildProperties = Properties()
@@ -90,6 +91,14 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.kotlinx.datetime)
+    implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
+    implementation(libs.koin.androidx.navigation)
+    implementation(libs.koin.core)
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -97,7 +106,6 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.android)
     implementation(libs.ktor.serialization.kotlinx.json)
