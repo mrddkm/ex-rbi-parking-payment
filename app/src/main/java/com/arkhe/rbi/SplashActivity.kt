@@ -24,7 +24,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.arkhe.rbi.ui.theme.AppTheme
+import com.arkhe.rbi.core.ui.theme.AppTheme
 import kotlinx.coroutines.delay
 
 @SuppressLint("CustomSplashScreen")

@@ -1,4 +1,4 @@
-package com.arkhe.rbi.ui.theme
+package com.arkhe.rbi.core.ui.theme
 import androidx.compose.ui.graphics.Color
 
 val primaryLight = Color(0xFF460002)

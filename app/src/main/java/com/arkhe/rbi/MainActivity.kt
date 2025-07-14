@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.arkhe.rbi.core.theme.ThemePreference
 import com.arkhe.rbi.presentation.VehicleCheckScreen
-import com.arkhe.rbi.ui.theme.AppTheme
+import com.arkhe.rbi.core.ui.theme.AppTheme
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {

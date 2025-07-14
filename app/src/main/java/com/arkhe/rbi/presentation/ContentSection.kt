@@ -43,7 +43,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.arkhe.rbi.R
-import com.arkhe.rbi.ui.theme.AppTheme
+import com.arkhe.rbi.core.ui.theme.AppTheme
 
 val SourceCodePro = FontFamily(
     Font(
