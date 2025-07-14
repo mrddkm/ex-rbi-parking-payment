@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,9 +20,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.QrCode
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -61,6 +65,7 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
+    modifier: Modifier = Modifier,
     onLogout: () -> Unit,
     viewModel: MainViewModel = koinViewModel()
 ) {
@@ -393,7 +398,71 @@ fun MainScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Generate qris Button
+            Button(
+                onClick = { viewModel.generateQRIS() },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = areaCode.isNotEmpty() && plateNumber.isNotEmpty() &&
+                        seriesCode.isNotEmpty() && uiState.selectedNominal.isNotEmpty()
+            ) {
+                if (uiState.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(16.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Icon(Icons.Default.QrCode, contentDescription = "Generate QRIS")
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Generate QRIS")
+            }
 
+            // Display Generated QRIS
+            if (uiState.generatedQRIS.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(16.dp))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "QRIS Code Generated",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = "Plat: ${uiState.plateNumber}",
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+
+                        Text(
+                            text = "Nominal: ${uiState.selectedNominal}",
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = uiState.generatedQRIS,
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer,
+                            textAlign = TextAlign.Center,
+                            fontFamily = SourceCodePro
+                        )
+                    }
+                }
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arkhe.rbi.data.local.UserEntity
 import com.arkhe.rbi.domain.repository.AuthRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -45,18 +46,38 @@ class MainViewModel(
             return
         }
 
-        // Generate QRIS with selected nominal
-        val modifiedQRIS = modifyQRISAmount(user.qris, state.selectedNominal)
-        _uiState.value = state.copy(
-            generatedQRIS = modifiedQRIS,
-            error = null
-        )
+        viewModelScope.launch {
+            _uiState.value = state.copy(isLoading = true, error = null)
+
+            try {
+                // Simulate API call delay
+                delay(2000)
+
+                // Generate QRIS with selected nominal
+                val modifiedQRIS = modifyQRISAmount(user.qris, state.selectedNominal)
+                _uiState.value = _uiState.value.copy(
+                    generatedQRIS = modifiedQRIS,
+                    isLoading = false,
+                    error = null
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = "Failed to generate QRIS: ${e.message}"
+                )
+            }
+        }
     }
 
     private fun modifyQRISAmount(originalQRIS: String, nominal: String): String {
         // Simple QRIS amount modification
         // In real implementation, you would need to properly modify the QRIS structure
-        return originalQRIS + "_" + nominal.replace("Rp", "").replace(".", "")
+        val amount = nominal.replace("Rp", "").replace(".", "").replace(",", "")
+        return "${originalQRIS}_${amount}_${System.currentTimeMillis()}"
+    }
+
+    fun clearError() {
+        _uiState.value = _uiState.value.copy(error = null)
     }
 
     fun logout() {
@@ -71,5 +92,6 @@ data class MainUiState(
     val plateNumber: String = "",
     val selectedNominal: String = "",
     val generatedQRIS: String = "",
+    val isLoading: Boolean = false,
     val error: String? = null
 )
