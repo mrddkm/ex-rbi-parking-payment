@@ -51,27 +51,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.arkhe.rbi.presentation.SourceCodePro
+import com.arkhe.rbi.data.local.UserEntity
+import com.arkhe.rbi.presentation.shared.FooterSection
+import com.arkhe.rbi.presentation.shared.SourceCodePro
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
+    isDarkTheme: Boolean,
+    onThemeToggle: () -> Unit,
     onLogout: () -> Unit,
-    viewModel: MainViewModel = koinViewModel()
+    viewModel: IMainViewModel = koinViewModel<MainViewModel>()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val context = LocalContext.current
+    val snackBarHostState = remember { SnackbarHostState() }
 
     var areaCode by remember { mutableStateOf("") }
     var plateNumber by remember { mutableStateOf("") }
@@ -83,7 +88,7 @@ fun MainScreen(
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let { error ->
-            snackbarHostState.showSnackbar(error)
+            snackBarHostState.showSnackbar(error)
         }
     }
 
@@ -96,7 +101,7 @@ fun MainScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Aplikasi Parkir",
+                        text = "Payment Parking",
                         fontWeight = FontWeight.Bold
                     )
                 },
@@ -110,29 +115,28 @@ fun MainScreen(
                 }
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackBarHostState) }
     ) { paddingValues ->
         Column(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // User Info
             uiState.currentUser?.let { user ->
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer
                     )
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp)
+                        modifier = modifier.padding(16.dp)
                     ) {
                         Text(
-                            text = "Selamat Datang, ${user.name}",
+                            text = user.name,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -145,27 +149,14 @@ fun MainScreen(
                     }
                 }
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Plate Number Input
+            Spacer(modifier = modifier.height(24.dp))
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = modifier.fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp)
+                    modifier = modifier.padding(16.dp)
                 ) {
-                    Text(
-                        text = "Input Plat Kendaraan",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // License Plate Input
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -178,7 +169,7 @@ fun MainScreen(
                         )
 
                         Row(
-                            modifier = Modifier
+                            modifier = modifier
                                 .fillMaxWidth()
                                 .background(
                                     color = Color.White,
@@ -204,12 +195,12 @@ fun MainScreen(
                                     keyboardType = KeyboardType.Text
                                 ),
                                 singleLine = true,
-                                modifier = Modifier
+                                modifier = modifier
                                     .width(60.dp)
                                     .focusRequester(areaCodeFocusRequester),
                                 decorationBox = { innerTextField ->
                                     Box(
-                                        modifier = Modifier
+                                        modifier = modifier
                                             .background(
                                                 color = Color.White,
                                                 shape = RoundedCornerShape(4.dp)
@@ -231,10 +222,7 @@ fun MainScreen(
                                     }
                                 }
                             )
-
-                            Spacer(modifier = Modifier.width(4.dp))
-
-                            // Plate Number
+                            Spacer(modifier = modifier.width(4.dp))
                             BasicTextField(
                                 value = plateNumber,
                                 onValueChange = {
@@ -252,10 +240,10 @@ fun MainScreen(
                                     keyboardType = KeyboardType.Number
                                 ),
                                 singleLine = true,
-                                modifier = Modifier.width(120.dp),
+                                modifier = modifier.width(120.dp),
                                 decorationBox = { innerTextField ->
                                     Box(
-                                        modifier = Modifier
+                                        modifier = modifier
                                             .background(
                                                 color = Color.White,
                                                 shape = RoundedCornerShape(4.dp)
@@ -277,10 +265,7 @@ fun MainScreen(
                                     }
                                 }
                             )
-
-                            Spacer(modifier = Modifier.width(4.dp))
-
-                            // Series Code
+                            Spacer(modifier = modifier.width(4.dp))
                             BasicTextField(
                                 value = seriesCode,
                                 onValueChange = { if (it.length <= 3) seriesCode = it.uppercase() },
@@ -296,10 +281,10 @@ fun MainScreen(
                                     keyboardType = KeyboardType.Text
                                 ),
                                 singleLine = true,
-                                modifier = Modifier.width(80.dp),
+                                modifier = modifier.width(80.dp),
                                 decorationBox = { innerTextField ->
                                     Box(
-                                        modifier = Modifier
+                                        modifier = modifier
                                             .background(
                                                 color = Color.White,
                                                 shape = RoundedCornerShape(4.dp)
@@ -323,10 +308,7 @@ fun MainScreen(
                             )
                         }
                     }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Clear Button
+                    Spacer(modifier = modifier.height(16.dp))
                     OutlinedButton(
                         onClick = {
                             areaCode = ""
@@ -335,33 +317,30 @@ fun MainScreen(
                             viewModel.updatePlateNumber("")
                             areaCodeFocusRequester.requestFocus()
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = modifier.fillMaxWidth()
                     ) {
                         Icon(Icons.Default.Refresh, contentDescription = "Clear")
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = modifier.width(8.dp))
                         Text("Clear")
                     }
                 }
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Nominal Selection
+            Spacer(modifier = modifier.height(16.dp))
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = modifier.fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp)
+                    modifier = modifier.padding(16.dp)
                 ) {
                     Text(
-                        text = "Pilih Nominal",
+                        text = "Nominal",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = modifier.height(16.dp))
 
                     Box {
                         OutlinedTextField(
@@ -369,7 +348,7 @@ fun MainScreen(
                             onValueChange = { },
                             label = { Text("Nominal Parkir") },
                             readOnly = true,
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = modifier.fillMaxWidth(),
                             trailingIcon = {
                                 IconButton(onClick = { isDropdownExpanded = true }) {
                                     Icon(Icons.Default.ArrowDropDown, contentDescription = "Expand")
@@ -394,40 +373,36 @@ fun MainScreen(
                     }
                 }
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Generate qris Button
+            Spacer(modifier = modifier.height(16.dp))
             Button(
                 onClick = { viewModel.generateQRIS() },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = modifier.fillMaxWidth(),
                 enabled = areaCode.isNotEmpty() && plateNumber.isNotEmpty() &&
                         seriesCode.isNotEmpty() && uiState.selectedNominal.isNotEmpty()
             ) {
                 if (uiState.isLoading) {
                     CircularProgressIndicator(
-                        modifier = Modifier.size(16.dp),
+                        modifier = modifier.size(16.dp),
                         color = MaterialTheme.colorScheme.onPrimary
                     )
                 } else {
                     Icon(Icons.Default.QrCode, contentDescription = "Generate QRIS")
                 }
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = modifier.width(8.dp))
                 Text("Generate QRIS")
             }
 
-            // Display Generated QRIS
             if (uiState.generatedQRIS.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = modifier.height(16.dp))
                 Card(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = modifier.fillMaxWidth(),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.tertiaryContainer
                     )
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = modifier.padding(16.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
@@ -437,7 +412,7 @@ fun MainScreen(
                             color = MaterialTheme.colorScheme.onTertiaryContainer
                         )
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = modifier.height(8.dp))
 
                         Text(
                             text = "Plat: ${uiState.plateNumber}",
@@ -451,7 +426,7 @@ fun MainScreen(
                             color = MaterialTheme.colorScheme.onTertiaryContainer
                         )
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = modifier.height(8.dp))
 
                         Text(
                             text = uiState.generatedQRIS,
@@ -463,6 +438,42 @@ fun MainScreen(
                     }
                 }
             }
+            Spacer(modifier = modifier.height(24.dp))
+            FooterSection(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .weight(0.15f),
+                isDarkTheme = isDarkTheme,
+                onThemeToggle = onThemeToggle
+            )
         }
     }
+}
+
+val mockUiState = MainUiState(
+    currentUser = UserEntity.fakeUserEntity(),
+    plateNumber = "",
+    selectedNominal = "",
+    generatedQRIS = "",
+    isLoading = false,
+    error = null
+)
+
+class MockMainViewModel : IMainViewModel {
+    override val uiState: StateFlow<MainUiState> = MutableStateFlow(mockUiState)
+    override fun updatePlateNumber(plateNumber: String) {}
+    override fun updateNominal(nominal: String) {}
+    override fun generateQRIS() {}
+    override fun logout() {}
+}
+
+@Preview(showBackground = true)
+@Composable
+fun MainScreenPreview() {
+    MainScreen(
+        isDarkTheme = false,
+        onThemeToggle = {},
+        onLogout = {},
+        viewModel = MockMainViewModel()
+    )
 }

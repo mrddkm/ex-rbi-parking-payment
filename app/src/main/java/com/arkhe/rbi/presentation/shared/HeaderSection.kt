@@ -1,4 +1,4 @@
-package com.arkhe.rbi.presentation
+package com.arkhe.rbi.presentation.shared
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement

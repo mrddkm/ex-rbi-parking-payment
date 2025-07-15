@@ -12,10 +12,9 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(
     private val authRepository: AuthRepository
-) : ViewModel() {
-
+) : ViewModel(), IMainViewModel {
     private val _uiState = MutableStateFlow(MainUiState())
-    val uiState = _uiState.asStateFlow()
+    override val uiState = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -25,15 +24,15 @@ class MainViewModel(
         }
     }
 
-    fun updatePlateNumber(plateNumber: String) {
+    override fun updatePlateNumber(plateNumber: String) {
         _uiState.value = _uiState.value.copy(plateNumber = plateNumber)
     }
 
-    fun updateNominal(nominal: String) {
+    override fun updateNominal(nominal: String) {
         _uiState.value = _uiState.value.copy(selectedNominal = nominal)
     }
 
-    fun generateQRIS() {
+    override fun generateQRIS() {
         val state = _uiState.value
         if (state.plateNumber.isBlank() || state.selectedNominal.isBlank()) {
             _uiState.value = state.copy(error = "Please fill all fields")
@@ -70,17 +69,11 @@ class MainViewModel(
     }
 
     private fun modifyQRISAmount(originalQRIS: String, nominal: String): String {
-        // Simple QRIS amount modification
-        // In real implementation, you would need to properly modify the QRIS structure
         val amount = nominal.replace("Rp", "").replace(".", "").replace(",", "")
         return "${originalQRIS}_${amount}_${System.currentTimeMillis()}"
     }
 
-    fun clearError() {
-        _uiState.value = _uiState.value.copy(error = null)
-    }
-
-    fun logout() {
+    override fun logout() {
         viewModelScope.launch {
             authRepository.logout()
         }

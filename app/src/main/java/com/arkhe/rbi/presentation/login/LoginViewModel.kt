@@ -9,20 +9,19 @@ import kotlinx.coroutines.launch
 
 class LoginViewModel(
     private val authRepository: AuthRepository
-) : ViewModel() {
-
+) : ViewModel(), ILoginViewModel {
     private val _uiState = MutableStateFlow(LoginUiState())
-    val uiState = _uiState.asStateFlow()
+    override val uiState = _uiState.asStateFlow()
 
-    fun updateUserId(userId: String) {
+    override fun updateUserId(userId: String) {
         _uiState.value = _uiState.value.copy(userId = userId)
     }
 
-    fun updatePassword(password: String) {
+    override fun updatePassword(password: String) {
         _uiState.value = _uiState.value.copy(password = password)
     }
 
-    fun login() {
+    override fun login() {
         val state = _uiState.value
         if (state.userId.isBlank() || state.password.isBlank()) {
             _uiState.value = state.copy(error = "Please fill all fields")

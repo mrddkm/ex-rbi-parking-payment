@@ -12,22 +12,17 @@ import kotlinx.coroutines.launch
 class RegisterViewModel(
     private val authRepository: AuthRepository,
     private val deviceInfoProvider: DeviceInfoProvider
-) : ViewModel() {
-
+) : ViewModel(), IRegisterViewModel {
     private val _uiState = MutableStateFlow(RegisterUiState())
-    val uiState = _uiState.asStateFlow()
+    override val uiState = _uiState.asStateFlow()
 
-    fun updateUserId(userId: String) {
+    override fun updateUserId(userId: String) {
         _uiState.value = _uiState.value.copy(userId = userId)
     }
 
-    fun updatePhone(phone: String) {
-        _uiState.value = _uiState.value.copy(phone = phone)
-    }
-
-    fun register() {
+    override fun register() {
         val state = _uiState.value
-        if (state.userId.isBlank() || state.phone.isBlank()) {
+        if (state.userId.isBlank()) {
             _uiState.value = state.copy(error = "Please fill all fields")
             return
         }
@@ -37,7 +32,7 @@ class RegisterViewModel(
         viewModelScope.launch {
             val deviceInfo = deviceInfoProvider.getDeviceInfo()
             val request = RegisterRequest(
-                userId = state.userId,
+                userId = state.userId.uppercase(),
                 phone = state.phone,
                 imei = deviceInfo.imei,
                 brand = deviceInfo.brand,
@@ -65,7 +60,7 @@ class RegisterViewModel(
 
 data class RegisterUiState(
     val userId: String = "",
-    val phone: String = "",
+    val phone: String = "085659988939",
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false,
     val error: String? = null,

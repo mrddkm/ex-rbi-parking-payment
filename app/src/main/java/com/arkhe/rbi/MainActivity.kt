@@ -21,10 +21,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.arkhe.rbi.core.theme.ThemePreference
 import com.arkhe.rbi.core.ui.theme.AppTheme
+import com.arkhe.rbi.di.databaseModule
+import com.arkhe.rbi.di.networkModule
+import com.arkhe.rbi.di.repositoryModule
+import com.arkhe.rbi.di.viewModelModule
 import com.arkhe.rbi.domain.repository.AuthRepository
+import com.arkhe.rbi.presentation.login.LoginScreen
 import com.arkhe.rbi.presentation.main.MainScreen
 import com.arkhe.rbi.presentation.register.RegisterScreen
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
 
 class MainActivity : ComponentActivity() {
     private val authRepository: AuthRepository by inject()
@@ -32,6 +40,15 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("LocalContextConfigurationRead")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        startKoin {
+            androidContext(this@MainActivity)
+            modules(
+                networkModule,
+                databaseModule,
+                repositoryModule,
+                viewModelModule
+            )
+        }
         enableEdgeToEdge()
         setContent {
             val context = LocalContext.current
@@ -39,13 +56,13 @@ class MainActivity : ComponentActivity() {
             val themePref = remember { ThemePreference(context) }
             val themeFlow = themePref.themeFlow.collectAsState(initial = null)
 
-            // Authentication state
-            val currentUser by authRepository.getCurrentUser().collectAsState(initial = null)
-            var isAuthenticated by remember { mutableStateOf(false) }
+            var isRegistered by remember { mutableStateOf(false) }
+            var isLoggedIn by remember { mutableStateOf(false) }
 
-            // Check authentication status
+            val currentUser by authRepository.getCurrentUser().collectAsState(initial = null)
             LaunchedEffect(currentUser) {
-                isAuthenticated = currentUser != null
+                isLoggedIn = currentUser != null
+                isRegistered = currentUser != null // If user exists, registration is done
             }
 
             val isSystemDark = when {
@@ -58,36 +75,52 @@ class MainActivity : ComponentActivity() {
 
             AppTheme(darkTheme = isDarkTheme) {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    if (isAuthenticated) {
-                        // Show main screen if authenticated
-                        MainScreen(
-                            modifier = Modifier.padding(innerPadding),
-                            onLogout = {
-                                isAuthenticated = false
-                            }
-                        )
-                    } else {
-                        // Show auth screen if not authenticated
-                        RegisterScreen(
-                            modifier = Modifier.padding(innerPadding),
-                            onRegistrationSuccess = {
-                                isAuthenticated = true
-                            }
-                        )
+                    when {
+                        !isRegistered -> {
+                            RegisterScreen(
+                                modifier = Modifier.padding(innerPadding),
+                                isDarkTheme = isDarkTheme,
+                                onThemeToggle = {
+                                    coroutineScope.launch {
+                                        themePref.setDarkTheme(!isDarkTheme)
+                                    }
+                                },
+                                onRegistrationSuccess = {
+                                    isRegistered = true
+                                }
+                            )
+                        }
+
+                        !isLoggedIn -> {
+                            LoginScreen(
+                                modifier = Modifier.padding(innerPadding),
+                                isDarkTheme = isDarkTheme,
+                                onThemeToggle = {
+                                    coroutineScope.launch {
+                                        themePref.setDarkTheme(!isDarkTheme)
+                                    }
+                                },
+                                onLoginSuccess = {
+                                    isLoggedIn = true
+                                }
+                            )
+                        }
+
+                        else -> {
+                            MainScreen(
+                                modifier = Modifier.padding(innerPadding),
+                                isDarkTheme = isDarkTheme,
+                                onThemeToggle = {
+                                    coroutineScope.launch {
+                                        themePref.setDarkTheme(!isDarkTheme)
+                                    }
+                                },
+                                onLogout = {
+                                    isLoggedIn = false
+                                }
+                            )
+                        }
                     }
-                    /*
-                    VehicleCheckScreen(
-                        modifier = Modifier.padding(innerPadding),
-                        isDarkTheme = isDarkTheme,
-                        onThemeToggle = {
-                            coroutineScope.launch {
-                                themePref.setDarkTheme(!isDarkTheme)
-                            }
-                        },
-                        context = context,
-                        coroutineScope = coroutineScope
-                    )
-                    */
                 }
             }
         }
