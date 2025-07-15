@@ -5,7 +5,6 @@ import com.arkhe.rbi.data.remote.dto.ErrorResponse
 import com.arkhe.rbi.data.remote.dto.LoginRequest
 import com.arkhe.rbi.data.remote.dto.RegisterRequest
 import io.ktor.client.HttpClient
-import io.ktor.client.call.body
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -49,9 +48,22 @@ class ApiClient(private val client: HttpClient) {
                 contentType(ContentType.Application.Json)
                 header("X-Authorization", authToken)
                 setBody(request)
-            }.body<AuthResponse>()
-            Result.success(response)
+            }
+            val responseBody = response.bodyAsText()
+
+            val jsonElement = Json.parseToJsonElement(responseBody)
+            val jsonObject = jsonElement.jsonObject
+            val status = jsonObject["status"]?.jsonPrimitive?.content
+
+            if (status == "success" && jsonObject.containsKey("data")) {
+                val authResponse = Json.decodeFromJsonElement<AuthResponse>(jsonElement)
+                Result.success(authResponse)
+            } else {
+                val errorResponse = Json.decodeFromJsonElement<ErrorResponse>(jsonElement)
+                Result.failure(Exception(errorResponse.message))
+            }
         } catch (e: Exception) {
+            println("Error during login ApiClient: ${e.message}")
             Result.failure(e)
         }
     }

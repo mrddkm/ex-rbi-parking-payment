@@ -58,10 +58,11 @@ class MainActivity : ComponentActivity() {
 
             var isRegistered by remember { mutableStateOf(false) }
             var isLoggedIn by remember { mutableStateOf(false) }
-            var activeUserID: String by remember { mutableStateOf("") }
+            var activeUserID: String by remember { mutableStateOf("Unknown") }
 
             LaunchedEffect(Unit) {
                 isRegistered = authRepository.hasRegisteredUser()
+                if (isRegistered) activeUserID = authRepository.getUser()
             }
 
             val currentUser by authRepository.getCurrentUser().collectAsState(initial = null)
@@ -69,11 +70,9 @@ class MainActivity : ComponentActivity() {
                 isLoggedIn = currentUser != null
             }
 
-            LaunchedEffect(Unit) {
-                activeUserID = authRepository.getUser()
-            }
-
-            println("Current user: $currentUser")
+            println("Is Registered: $isRegistered")
+            println("Is Logged In: $isLoggedIn")
+            println("Active UserID: $activeUserID")
 
             val isSystemDark = when {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ->
@@ -104,6 +103,12 @@ class MainActivity : ComponentActivity() {
                         }
 
                         !isLoggedIn -> {
+                            if (activeUserID == "Unknown"){
+                                LaunchedEffect(Unit) {
+                                    activeUserID = authRepository.getUser()
+                                }
+                            }
+
                             LoginScreen(
                                 modifier = Modifier.padding(innerPadding),
                                 isDarkTheme = isDarkTheme,

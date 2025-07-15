@@ -70,6 +70,6 @@ data class Institution(
 
 @Serializable
 data class Additionals(
-    val imei: String,
-    val qris: String
+    val imei: String? = null,
+    val qris: String? = null,
 )

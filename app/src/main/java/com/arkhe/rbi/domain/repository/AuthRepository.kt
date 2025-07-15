@@ -44,7 +44,6 @@ class AuthRepository(
                 }
             }
         } catch (e: Exception) {
-            print("Error during registration: ${e.message}")
             return Result.failure(e)
         }
         return result
@@ -52,13 +51,12 @@ class AuthRepository(
 
     suspend fun login(username: String, password: String): Result<AuthResponse> {
         val registeredUser = userDao.getUserById(username)
-        println("Registered user: $registeredUser")
         if (registeredUser == null) {
             return Result.failure(Exception("User not registered"))
         }
 
         val loginRequest = LoginRequest(username, password)
-        val result = apiClient.login(loginRequest, registeredUser.id)
+        val result = apiClient.login(loginRequest, registeredUser.token)
 
         if (result.isSuccess) {
             val response = result.getOrNull()
@@ -68,7 +66,7 @@ class AuthRepository(
                     qris = authResponse.data.qris ?: registeredUser.qris,
                     isLoggedIn = true
                 )
-                userDao.logoutAllUsers() // Logout all users first
+                userDao.logoutAllUsers()
                 userDao.updateUser(updatedUser)
             }
         }
