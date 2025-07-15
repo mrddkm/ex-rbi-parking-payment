@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -54,6 +55,7 @@ fun LoginScreen(
     isDarkTheme: Boolean,
     onThemeToggle: () -> Unit,
     onLoginSuccess: () -> Unit,
+    userId: String,
     viewModel: ILoginViewModel = koinViewModel<LoginViewModel>()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -80,7 +82,6 @@ fun LoginScreen(
                 .fillMaxSize()
                 .padding(paddingValues),
         ) {
-            Spacer(modifier = Modifier.height(10.dp))
             HeaderSection(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -110,7 +111,7 @@ fun LoginScreen(
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 Card(
-                    modifier = modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                     shape = RoundedCornerShape(16.dp)
                 ) {
@@ -119,21 +120,21 @@ fun LoginScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         OutlinedTextField(
-                            value = uiState.userId,
+                            value = userId,
                             onValueChange = viewModel::updateUserId,
                             label = { Text("User ID") },
-                            placeholder = { Text("Masukkan User ID") },
-                            modifier = modifier.fillMaxWidth(),
-                            enabled = !uiState.isLoading,
+                            placeholder = { },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = false,
                             singleLine = true,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                         )
                         OutlinedTextField(
                             value = uiState.password,
                             onValueChange = viewModel::updatePassword,
                             label = { Text("Password") },
-                            placeholder = { Text("Masukkan password") },
-                            modifier = modifier.fillMaxWidth(),
+                            placeholder = { Text("Input password") },
+                            modifier = Modifier.fillMaxWidth(),
                             enabled = !uiState.isLoading,
                             singleLine = true,
                             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -147,20 +148,20 @@ fun LoginScreen(
                                         contentDescription = if (passwordVisible) "Hide password" else "Show password"
                                     )
                                 }
-                            }
+                            },
                         )
-                        Spacer(modifier = modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(4.dp))
                         Button(
                             onClick = viewModel::login,
-                            modifier = modifier
+                            modifier = Modifier
                                 .fillMaxWidth()
                                 .height(50.dp),
-                            enabled = !uiState.isLoading && uiState.userId.isNotBlank() && uiState.password.isNotBlank(),
+                            enabled = !uiState.isLoading && uiState.password.isNotBlank(),
                             shape = RoundedCornerShape(12.dp)
                         ) {
                             if (uiState.isLoading) {
                                 CircularProgressIndicator(
-                                    modifier = modifier.size(20.dp),
+                                    modifier = Modifier.size(20.dp),
                                     color = MaterialTheme.colorScheme.onPrimary
                                 )
                             } else {
@@ -175,7 +176,7 @@ fun LoginScreen(
                 }
             }
             FooterSection(
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .weight(0.1f),
                 isDarkTheme = isDarkTheme,
@@ -207,6 +208,7 @@ fun LoginScreenPreview() {
         isDarkTheme = false,
         onThemeToggle = {},
         onLoginSuccess = {},
+        userId = "GAENTA",
         viewModel = MockLoginViewModel()
     )
 }

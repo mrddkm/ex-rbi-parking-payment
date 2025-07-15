@@ -38,6 +38,7 @@ class ApiClient(private val client: HttpClient) {
                 Result.failure(Exception(errorResponse.message))
             }
         } catch (e: Exception) {
+            println("Error during register ApiClient: ${e.message}")
             Result.failure(e)
         }
     }

@@ -60,7 +60,7 @@ class RegisterViewModel(
 
 data class RegisterUiState(
     val userId: String = "",
-    val phone: String = "085659988939",
+    val phone: String = "6280000000000",
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false,
     val error: String? = null,

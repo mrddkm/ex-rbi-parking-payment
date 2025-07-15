@@ -58,12 +58,22 @@ class MainActivity : ComponentActivity() {
 
             var isRegistered by remember { mutableStateOf(false) }
             var isLoggedIn by remember { mutableStateOf(false) }
+            var activeUserID: String by remember { mutableStateOf("") }
+
+            LaunchedEffect(Unit) {
+                isRegistered = authRepository.hasRegisteredUser()
+            }
 
             val currentUser by authRepository.getCurrentUser().collectAsState(initial = null)
             LaunchedEffect(currentUser) {
                 isLoggedIn = currentUser != null
-                isRegistered = currentUser != null // If user exists, registration is done
             }
+
+            LaunchedEffect(Unit) {
+                activeUserID = authRepository.getUser()
+            }
+
+            println("Current user: $currentUser")
 
             val isSystemDark = when {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ->
@@ -86,7 +96,9 @@ class MainActivity : ComponentActivity() {
                                     }
                                 },
                                 onRegistrationSuccess = {
-                                    isRegistered = true
+                                    coroutineScope.launch {
+                                        isRegistered = authRepository.hasRegisteredUser()
+                                    }
                                 }
                             )
                         }
@@ -100,6 +112,7 @@ class MainActivity : ComponentActivity() {
                                         themePref.setDarkTheme(!isDarkTheme)
                                     }
                                 },
+                                userId = activeUserID,
                                 onLoginSuccess = {
                                     isLoggedIn = true
                                 }

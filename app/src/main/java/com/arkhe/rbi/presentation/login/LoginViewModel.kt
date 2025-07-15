@@ -13,6 +13,13 @@ class LoginViewModel(
     private val _uiState = MutableStateFlow(LoginUiState())
     override val uiState = _uiState.asStateFlow()
 
+    init {
+        viewModelScope.launch {
+            val userIdFromRoom = authRepository.getUser()
+            _uiState.value = _uiState.value.copy(userId = userIdFromRoom)
+        }
+    }
+
     override fun updateUserId(userId: String) {
         _uiState.value = _uiState.value.copy(userId = userId)
     }
