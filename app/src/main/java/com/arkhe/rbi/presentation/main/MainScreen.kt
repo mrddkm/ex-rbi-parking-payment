@@ -20,8 +20,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.filled.CheckCircleOutline
-import androidx.compose.material.icons.filled.QrCode
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -339,7 +337,7 @@ fun MainScreen(
                                     areaCode = ""
                                     plateNumber = ""
                                     seriesCode = ""
-                                    viewModel.updatePlateNumber("")
+                                    viewModel.updatePlatKendaraan("")
                                     areaCodeFocusRequester.requestFocus()
                                 },
                                 modifier = Modifier
@@ -348,7 +346,7 @@ fun MainScreen(
                                 Icon(Icons.Default.Refresh, contentDescription = "Clear")
                             }
                             Button(
-                                onClick = { viewModel.generateQRIS() },
+                                onClick = { viewModel.updatePlatKendaraan("$areaCode$plateNumber$seriesCode") },
                                 modifier = Modifier
                                     .weight(0.8f),
                                 shape = RoundedCornerShape(8.dp),
@@ -393,7 +391,7 @@ fun MainScreen(
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "Plat: ${uiState.plateNumber}",
+                                text = "Plat: ${uiState.plateKendaraan}",
                                 fontSize = 14.sp,
                                 color = MaterialTheme.colorScheme.onTertiaryContainer
                             )
@@ -427,7 +425,7 @@ fun MainScreen(
 
 val mockUiState = MainUiState(
     currentUser = UserEntity.fakeUserEntity(),
-    plateNumber = "",
+    plateKendaraan = "",
     selectedNominal = "",
     generatedQRIS = "",
     isLoading = false,
@@ -436,7 +434,7 @@ val mockUiState = MainUiState(
 
 class MockMainViewModel : IMainViewModel {
     override val uiState: StateFlow<MainUiState> = MutableStateFlow(mockUiState)
-    override fun updatePlateNumber(plateNumber: String) {}
+    override fun updatePlatKendaraan(platKendaraan: String) {}
     override fun updateNominal(nominal: String) {}
     override fun generateQRIS() {}
     override fun logout() {}

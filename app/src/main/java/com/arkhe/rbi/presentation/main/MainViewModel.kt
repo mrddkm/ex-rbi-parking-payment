@@ -24,8 +24,8 @@ class MainViewModel(
         }
     }
 
-    override fun updatePlateNumber(plateNumber: String) {
-        _uiState.value = _uiState.value.copy(plateNumber = plateNumber)
+    override fun updatePlatKendaraan(platKendaraan: String) {
+        _uiState.value = _uiState.value.copy(plateKendaraan = platKendaraan)
     }
 
     override fun updateNominal(nominal: String) {
@@ -35,8 +35,8 @@ class MainViewModel(
     override fun generateQRIS() {
         val state = _uiState.value
         println("Generating QRIS with state: $state")
-        println("Selected Nominal: ${state.plateNumber}")
-        if (state.plateNumber.isBlank()) {
+        println("Plat Kendaraan: ${state.plateKendaraan}")
+        if (state.plateKendaraan.isBlank()) {
             _uiState.value = state.copy(error = "Please fill all fields")
             return
         }
@@ -84,7 +84,7 @@ class MainViewModel(
 
 data class MainUiState(
     val currentUser: UserEntity? = null,
-    val plateNumber: String = "",
+    val plateKendaraan: String = "",
     val selectedNominal: String = "",
     val generatedQRIS: String = "",
     val isLoading: Boolean = false,
