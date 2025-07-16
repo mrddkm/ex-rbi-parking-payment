@@ -20,21 +20,17 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.CheckCircleOutline
 import androidx.compose.material.icons.filled.QrCode
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -82,14 +78,10 @@ fun MainScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackBarHostState = remember { SnackbarHostState() }
-
     var areaCode by remember { mutableStateOf("") }
     var plateNumber by remember { mutableStateOf("") }
     var seriesCode by remember { mutableStateOf("") }
-    var isDropdownExpanded by remember { mutableStateOf(false) }
-
     val areaCodeFocusRequester = remember { FocusRequester() }
-    val nominalOptions = listOf("Rp50.000", "Rp100.000")
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let { error ->
@@ -150,7 +142,7 @@ fun MainScreen(
             )
             Column(
                 modifier = modifier
-                    .weight(0.75f)
+                    .weight(0.73f)
                     .fillMaxWidth()
                     .padding(16.dp)
                     .verticalScroll(rememberScrollState()),
@@ -160,12 +152,10 @@ fun MainScreen(
                 uiState.currentUser?.let { user ->
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer
-                        )
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                     ) {
                         Column(
-                            modifier = Modifier.padding(2.dp)
+                            modifier = Modifier.padding(10.dp)
                         ) {
                             Text(
                                 text = user.name,
@@ -176,13 +166,13 @@ fun MainScreen(
                         }
                     }
                 }
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
                     Column(
-                        modifier = Modifier.padding(8.dp)
+                        modifier = Modifier.padding(16.dp)
                     ) {
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -196,211 +186,184 @@ fun MainScreen(
                             )
                             Row(
                                 modifier = Modifier
-                                    .fillMaxWidth(),
+                                    .fillMaxWidth()
+                                    .height(50.dp)
+                                    .background(
+                                        color = Color.White,
+                                        shape = RoundedCornerShape(8.dp)
+                                    )
+                                    .padding(horizontal = 4.dp, vertical = 4.dp),
                                 horizontalArrangement = Arrangement.Center,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                OutlinedButton(
-                                    onClick = {
-                                        areaCode = ""
-                                        plateNumber = ""
-                                        seriesCode = ""
-                                        viewModel.updatePlateNumber("")
-                                        areaCodeFocusRequester.requestFocus()
-                                    }
-                                ) {
-                                    Icon(Icons.Default.Refresh, contentDescription = "Clear")
-                                }
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Row(
+                                BasicTextField(
+                                    value = areaCode,
+                                    onValueChange = {
+                                        if (it.length <= 2) areaCode = it.uppercase()
+                                    },
+                                    textStyle = TextStyle(
+                                        fontSize = 35.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = Color.Black,
+                                        textAlign = TextAlign.Center,
+                                        fontFamily = SourceCodePro
+                                    ),
+                                    keyboardOptions = KeyboardOptions(
+                                        capitalization = KeyboardCapitalization.Characters,
+                                        keyboardType = KeyboardType.Text
+                                    ),
+                                    singleLine = true,
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .background(
-                                            color = Color.White,
-                                            shape = RoundedCornerShape(8.dp)
-                                        )
-                                        .padding(horizontal = 4.dp, vertical = 4.dp),
-                                    horizontalArrangement = Arrangement.Center,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    BasicTextField(
-                                        value = areaCode,
-                                        onValueChange = {
-                                            if (it.length <= 2) areaCode = it.uppercase()
-                                        },
-                                        textStyle = TextStyle(
-                                            fontSize = 32.sp,
-                                            fontWeight = FontWeight.ExtraBold,
-                                            color = Color.Black,
-                                            textAlign = TextAlign.Center,
-                                            fontFamily = SourceCodePro
-                                        ),
-                                        keyboardOptions = KeyboardOptions(
-                                            capitalization = KeyboardCapitalization.Characters,
-                                            keyboardType = KeyboardType.Text
-                                        ),
-                                        singleLine = true,
-                                        modifier = Modifier
-                                            .width(60.dp)
-                                            .focusRequester(areaCodeFocusRequester),
-                                        decorationBox = { innerTextField ->
-                                            Box(
-                                                modifier = Modifier
-                                                    .background(
-                                                        color = Color.White,
-                                                        shape = RoundedCornerShape(4.dp)
-                                                    )
-                                                    .padding(horizontal = 1.dp, vertical = 1.dp),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                if (areaCode.isEmpty()) {
-                                                    Text(
-                                                        text = "F",
-                                                        fontSize = 32.sp,
-                                                        fontWeight = FontWeight.Light,
-                                                        color = Color.LightGray,
-                                                        textAlign = TextAlign.Center,
-                                                        fontFamily = SourceCodePro
-                                                    )
-                                                }
-                                                innerTextField()
+                                        .width(60.dp)
+                                        .focusRequester(areaCodeFocusRequester),
+                                    decorationBox = { innerTextField ->
+                                        Box(
+                                            modifier = Modifier
+                                                .background(
+                                                    color = Color.White,
+                                                    shape = RoundedCornerShape(4.dp)
+                                                )
+                                                .padding(horizontal = 1.dp, vertical = 1.dp),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            if (areaCode.isEmpty()) {
+                                                Text(
+                                                    text = "F",
+                                                    fontSize = 35.sp,
+                                                    fontWeight = FontWeight.Light,
+                                                    color = Color.LightGray,
+                                                    textAlign = TextAlign.Center,
+                                                    fontFamily = SourceCodePro
+                                                )
                                             }
+                                            innerTextField()
                                         }
-                                    )
-                                    Spacer(modifier = Modifier.width(1.dp))
-                                    BasicTextField(
-                                        value = plateNumber,
-                                        onValueChange = {
-                                            if (it.length <= 4 && it.all { char -> char.isDigit() })
-                                                plateNumber = it
-                                        },
-                                        textStyle = TextStyle(
-                                            fontSize = 32.sp,
-                                            fontWeight = FontWeight.ExtraBold,
-                                            color = Color.Black,
-                                            textAlign = TextAlign.Center,
-                                            fontFamily = SourceCodePro
-                                        ),
-                                        keyboardOptions = KeyboardOptions(
-                                            keyboardType = KeyboardType.Number
-                                        ),
-                                        singleLine = true,
-                                        modifier = Modifier.width(120.dp),
-                                        decorationBox = { innerTextField ->
-                                            Box(
-                                                modifier = Modifier
-                                                    .background(
-                                                        color = Color.White,
-                                                        shape = RoundedCornerShape(4.dp)
-                                                    )
-                                                    .padding(horizontal = 1.dp, vertical = 1.dp),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                if (plateNumber.isEmpty()) {
-                                                    Text(
-                                                        text = "8939",
-                                                        fontSize = 32.sp,
-                                                        fontWeight = FontWeight.Light,
-                                                        color = Color.LightGray,
-                                                        textAlign = TextAlign.Center,
-                                                        fontFamily = SourceCodePro
-                                                    )
-                                                }
-                                                innerTextField()
-                                            }
-                                        }
-                                    )
-                                    Spacer(modifier = Modifier.width(1.dp))
-                                    BasicTextField(
-                                        value = seriesCode,
-                                        onValueChange = {
-                                            if (it.length <= 3) seriesCode = it.uppercase()
-                                        },
-                                        textStyle = TextStyle(
-                                            fontSize = 32.sp,
-                                            fontWeight = FontWeight.ExtraBold,
-                                            color = Color.Black,
-                                            textAlign = TextAlign.Center,
-                                            fontFamily = SourceCodePro
-                                        ),
-                                        keyboardOptions = KeyboardOptions(
-                                            capitalization = KeyboardCapitalization.Characters,
-                                            keyboardType = KeyboardType.Text
-                                        ),
-                                        singleLine = true,
-                                        modifier = Modifier.width(80.dp),
-                                        decorationBox = { innerTextField ->
-                                            Box(
-                                                modifier = modifier
-                                                    .background(
-                                                        color = Color.White,
-                                                        shape = RoundedCornerShape(4.dp)
-                                                    )
-                                                    .padding(horizontal = 1.dp, vertical = 1.dp),
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                if (seriesCode.isEmpty()) {
-                                                    Text(
-                                                        text = "ABC",
-                                                        fontSize = 32.sp,
-                                                        fontWeight = FontWeight.Light,
-                                                        color = Color.LightGray,
-                                                        textAlign = TextAlign.Center,
-                                                        fontFamily = SourceCodePro
-                                                    )
-                                                }
-                                                innerTextField()
-                                            }
-                                        }
-                                    )
-                                }
-
-                            }
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(8.dp)
-                    ) {
-                        Text(
-                            text = "Nominal",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Box {
-                            OutlinedTextField(
-                                value = uiState.selectedNominal,
-                                onValueChange = { },
-                                label = { Text("Nominal Parkir") },
-                                readOnly = true,
-                                modifier = Modifier.fillMaxWidth(),
-                                trailingIcon = {
-                                    IconButton(onClick = { isDropdownExpanded = true }) {
-                                        Icon(
-                                            Icons.Default.ArrowDropDown,
-                                            contentDescription = "Expand"
-                                        )
                                     }
-                                }
-                            )
-                            DropdownMenu(
-                                expanded = isDropdownExpanded,
-                                onDismissRequest = { isDropdownExpanded = false }
-                            ) {
-                                nominalOptions.forEach { nominal ->
-                                    DropdownMenuItem(
-                                        text = { Text(nominal) },
-                                        onClick = {
-                                            viewModel.updateNominal(nominal)
-                                            isDropdownExpanded = false
+                                )
+                                Spacer(modifier = Modifier.width(2.dp))
+                                BasicTextField(
+                                    value = plateNumber,
+                                    onValueChange = {
+                                        if (it.length <= 4 && it.all { char -> char.isDigit() })
+                                            plateNumber = it
+                                    },
+                                    textStyle = TextStyle(
+                                        fontSize = 35.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = Color.Black,
+                                        textAlign = TextAlign.Center,
+                                        fontFamily = SourceCodePro
+                                    ),
+                                    keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Number
+                                    ),
+                                    singleLine = true,
+                                    modifier = Modifier.width(120.dp),
+                                    decorationBox = { innerTextField ->
+                                        Box(
+                                            modifier = Modifier
+                                                .background(
+                                                    color = Color.White,
+                                                    shape = RoundedCornerShape(4.dp)
+                                                )
+                                                .padding(horizontal = 1.dp, vertical = 1.dp),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            if (plateNumber.isEmpty()) {
+                                                Text(
+                                                    text = "8939",
+                                                    fontSize = 35.sp,
+                                                    fontWeight = FontWeight.Light,
+                                                    color = Color.LightGray,
+                                                    textAlign = TextAlign.Center,
+                                                    fontFamily = SourceCodePro
+                                                )
+                                            }
+                                            innerTextField()
                                         }
+                                    }
+                                )
+                                Spacer(modifier = Modifier.width(2.dp))
+                                BasicTextField(
+                                    value = seriesCode,
+                                    onValueChange = {
+                                        if (it.length <= 3) seriesCode = it.uppercase()
+                                    },
+                                    textStyle = TextStyle(
+                                        fontSize = 35.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = Color.Black,
+                                        textAlign = TextAlign.Center,
+                                        fontFamily = SourceCodePro
+                                    ),
+                                    keyboardOptions = KeyboardOptions(
+                                        capitalization = KeyboardCapitalization.Characters,
+                                        keyboardType = KeyboardType.Text
+                                    ),
+                                    singleLine = true,
+                                    modifier = Modifier
+                                        .width(100.dp),
+                                    decorationBox = { innerTextField ->
+                                        Box(
+                                            modifier = Modifier
+                                                .background(
+                                                    color = Color.White,
+                                                    shape = RoundedCornerShape(4.dp)
+                                                )
+                                                .padding(horizontal = 1.dp, vertical = 1.dp),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            if (seriesCode.isEmpty()) {
+                                                Text(
+                                                    text = "ABC",
+                                                    fontSize = 35.sp,
+                                                    fontWeight = FontWeight.Light,
+                                                    color = Color.LightGray,
+                                                    textAlign = TextAlign.Center,
+                                                    fontFamily = SourceCodePro
+                                                )
+                                            }
+                                            innerTextField()
+                                        }
+                                    }
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            IconButton(
+                                onClick = {
+                                    areaCode = ""
+                                    plateNumber = ""
+                                    seriesCode = ""
+                                    viewModel.updatePlateNumber("")
+                                    areaCodeFocusRequester.requestFocus()
+                                },
+                                modifier = Modifier
+                                    .weight(0.2f)
+                            ) {
+                                Icon(Icons.Default.Refresh, contentDescription = "Clear")
+                            }
+                            Button(
+                                onClick = { viewModel.generateQRIS() },
+                                modifier = Modifier
+                                    .weight(0.8f),
+                                shape = RoundedCornerShape(8.dp),
+                                enabled = areaCode.isNotEmpty() && plateNumber.isNotEmpty() && seriesCode.isNotEmpty()
+                            ) {
+                                if (uiState.isLoading) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(16.dp),
+                                        color = MaterialTheme.colorScheme.onPrimary
+                                    )
+                                } else {
+                                    Text(
+                                        text = "Check",
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.ExtraBold
                                     )
                                 }
                             }
@@ -408,23 +371,6 @@ fun MainScreen(
                     }
                 }
                 Spacer(modifier = Modifier.height(8.dp))
-                Button(
-                    onClick = { viewModel.generateQRIS() },
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = areaCode.isNotEmpty() && plateNumber.isNotEmpty() &&
-                            seriesCode.isNotEmpty() && uiState.selectedNominal.isNotEmpty()
-                ) {
-                    if (uiState.isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                    } else {
-                        Icon(Icons.Default.QrCode, contentDescription = "Generate QRIS")
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Generate QRIS")
-                }
 
                 if (uiState.generatedQRIS.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(16.dp))
@@ -471,7 +417,7 @@ fun MainScreen(
             FooterSection(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(0.1f),
+                    .weight(0.12f),
                 isDarkTheme = isDarkTheme,
                 onThemeToggle = onThemeToggle
             )

@@ -34,7 +34,9 @@ class MainViewModel(
 
     override fun generateQRIS() {
         val state = _uiState.value
-        if (state.plateNumber.isBlank() || state.selectedNominal.isBlank()) {
+        println("Generating QRIS with state: $state")
+        println("Selected Nominal: ${state.plateNumber}")
+        if (state.plateNumber.isBlank()) {
             _uiState.value = state.copy(error = "Please fill all fields")
             return
         }

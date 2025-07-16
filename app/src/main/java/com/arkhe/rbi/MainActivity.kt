@@ -70,10 +70,6 @@ class MainActivity : ComponentActivity() {
                 isLoggedIn = currentUser != null
             }
 
-            println("Is Registered: $isRegistered")
-            println("Is Logged In: $isLoggedIn")
-            println("Active UserID: $activeUserID")
-
             val isSystemDark = when {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ->
                     (context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES

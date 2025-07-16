@@ -90,7 +90,7 @@ fun HeaderMainSection(modifier: Modifier = Modifier) {
                 contentDescription = "Client",
                 modifier = Modifier
                     .size(80.dp)
-                    .padding(2.dp),
+                    .padding(1.dp),
                 contentScale = ContentScale.Fit
             )
             Text(

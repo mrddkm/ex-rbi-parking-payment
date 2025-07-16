@@ -52,6 +52,7 @@ data class User(
     val createdDate: String,
     val createdBy: String,
     val updatedDate: String,
+    val updatedBy: String? = null,
     val roles: Map<String, String>
 )
 

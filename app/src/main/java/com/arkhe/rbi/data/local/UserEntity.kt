@@ -23,12 +23,12 @@ data class UserEntity(
 ) {
     companion object {
         fun fakeUserEntity() = UserEntity(
-            id = "DISHUB02",
-            userId = "user123",
+            id = "C8EFFEAC678944E3B12977717B884500",
+            userId = "GAENTA",
             email = "user@example.com",
-            name = "Kolektor DISHUB 02",
+            name = "Gaenta Sinergi Sukses",
             avatar = "https://example.com/avatar.jpg",
-            phone = "08123456789",
+            phone = "080000000000",
             token = "84e66d73-f472-4975-bed0-7282919ece92",
             qris = "00020101021126610017ID.CO.BANKBJB.WWW0118936001103001278321020713436290303UMI51440014ID.CO.QRIS.WWW0215ID10221796982980303UMI5204546253033605802ID5919PARKIR BERLANGGANAN6007CIANJUR61054321162070703A016304F00C",
             imei = "865150034684065",
