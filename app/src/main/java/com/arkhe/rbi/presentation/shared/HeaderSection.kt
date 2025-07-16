@@ -75,6 +75,33 @@ fun HeaderSection(modifier: Modifier = Modifier) {
     }
 }
 
+@Composable
+fun HeaderMainSection(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.client_kab_cianjur_ic),
+                contentDescription = "Client",
+                modifier = Modifier
+                    .size(80.dp)
+                    .padding(2.dp),
+                contentScale = ContentScale.Fit
+            )
+            Text(
+                "Kabupaten Cianjur",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+            )
+        }
+    }
+}
+
 @Preview
 @Composable
 fun HeaderSectionPreview() {
